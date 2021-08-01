@@ -2,6 +2,7 @@ package smg
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -13,8 +14,9 @@ import (
 )
 
 type Spider struct {
-	client *http.Client
-	visted []string
+	client   *http.Client
+	visted   []string
+	MaxDepth int
 }
 
 type Response struct {
@@ -53,6 +55,16 @@ func NewContext() *Context {
 }
 
 func (s *Spider) Fetch(url string) error {
+	depth := 1
+	if !isValidUrl(url) {
+		return errors.New("Url is empty")
+	}
+	if s.MaxDepth > 0 && s.MaxDepth < depth {
+		return nil
+	}
+	if s.hasVisited(url) {
+		return nil
+	}
 	s.visted = append(s.visted, url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -103,4 +115,36 @@ func (s *Spider) parse(req *Request, res *Response) {
 			fmt.Println("-----")
 		}
 	})
+}
+
+func isValidUrl(u string) bool {
+	return u != ""
+}
+func (s *Spider) hasVisited(u string) bool {
+        visited := false
+  for _ ,v := s.visted {
+    if v == u {
+      visited = true
+      break
+    }
+  }
+        return visited
+}
+
+func (c *Context) Get(key string) string {
+	if v, ok := c.contextMap[key]; ok {
+		return v
+	}
+	return ""
+}
+
+func (c *Context) Put(key, value string, ovrride bool) error {
+	if _, ok := c.contextMap[key]; ok && ovrride {
+		c.contextMap[key] = value
+	} else if ok && !ovrride {
+		return errors.New("Key already exists")
+	} else {
+		c.contextMap[key] = value
+	}
+	return nil
 }
