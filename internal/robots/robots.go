@@ -1,4 +1,4 @@
-package smg
+package robots
 
 import (
 	"io/ioutil"
