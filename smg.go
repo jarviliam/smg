@@ -17,6 +17,7 @@ type Spider struct {
 	client   *http.Client
 	visted   []string
 	MaxDepth int
+	robots   map[string]string
 }
 
 type Response struct {
@@ -24,6 +25,9 @@ type Response struct {
 	Body    []byte
 	Ctx     *Context
 	Request *http.Request
+}
+type LinkElement struct {
+	Attributes map[string]string
 }
 type Request struct {
 	URL     *url.URL
@@ -54,19 +58,21 @@ func NewContext() *Context {
 	return c
 }
 
-func (s *Spider) Fetch(url string) error {
+func (s *Spider) Fetch(u string) error {
 	depth := 1
-	if !isValidUrl(url) {
+	parsedUrl, err := url.Parse(u)
+	s.GetRobots(parsedUrl)
+	if err != nil {
 		return errors.New("Url is empty")
 	}
 	if s.MaxDepth > 0 && s.MaxDepth < depth {
 		return nil
 	}
-	if s.hasVisited(url) {
+	if s.hasVisited(u) {
 		return nil
 	}
 	s.visted = append(s.visted, url)
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -117,18 +123,18 @@ func (s *Spider) parse(req *Request, res *Response) {
 	})
 }
 
-func isValidUrl(u string) bool {
-	return u != ""
+func isValidUrl(u url.URL) bool {
+	return u.Host != ""
 }
 func (s *Spider) hasVisited(u string) bool {
-        visited := false
-  for _ ,v := s.visted {
-    if v == u {
-      visited = true
-      break
-    }
-  }
-        return visited
+	visited := false
+	for _, v := range s.visted {
+		if v == u {
+			visited = true
+			break
+		}
+	}
+	return visited
 }
 
 func (c *Context) Get(key string) string {
@@ -147,4 +153,11 @@ func (c *Context) Put(key, value string, ovrride bool) error {
 		c.contextMap[key] = value
 	}
 	return nil
+}
+
+func (s *Spider) GetRobots(u *url.URL) {
+	robot, ok := s.robots[u.Host]
+	if !ok {
+
+	}
 }
