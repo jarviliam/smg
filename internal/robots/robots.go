@@ -32,11 +32,11 @@ func NewRobots(ignore bool) *Robots {
 
 func (r *Robots) ParseFromResponse(res *http.Response) {
 	if res == nil {
-
+            return
 	}
 	buff, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-
+            return
 	}
 
 	statusCode := res.StatusCode
@@ -60,6 +60,10 @@ func (r *Robots) ParseFromResponse(res *http.Response) {
 
 func parseRobots(body []byte) {
 	lines, err := intoLines(body)
+  reader := NewReader(body)
+  tokens := reader.ExtractTokens()
+  parser := NewParser(tokens)
+  parer.Extract()
 }
 
 func intoLines(body []byte) ([]string, error) {

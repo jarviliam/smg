@@ -1,99 +1,50 @@
 package robots
 
-import (
-	"go/token"
-	"unicode/utf8"
-)
+import "strings"
 
 type Parser struct {
-	isLoaded bool
-	position token.Position
-	input    []byte
-	curr     rune
+	tokens   []string
+	position int
 }
 
-func NewParser() *Parser {
-	p := &Parser{}
+func NewParser(tokens []string) *Parser {
+	p := &Parser{
+		tokens: tokens,
+	}
 	return p
 }
 
-/**
-* Extracts The Robots Text File
-* Returns a List of String Tokens
- */
-func (p *Parser) Extract() []string {
-	if !p.isLoaded {
+func (p *Parser) parseTokens() {
+
+}
+
+func (p *Parser) parseLine() {
+	token1, ok1 := p.popToken()
+	if !ok1 {
 		return
 	}
-	output := make([]string, 0, 64)
-	for {
-		token := p.read()
-		if token == "" {
-			break
-		}
-		output = append(output, token)
+	token2, ok2 := p.peekToken()
+	if !ok2 {
+		return
 	}
-	return output
+
+	switch strings.ToLower(token1) {
+
+	}
 }
 
-/*
-* Basic Parser Works as :
-* 1) Check to see if not ovrflowing
-* 2) Skip all Spaces
-* 3) If The next non space rune is a new line, add to string array (new line is a token). Skip duplicate newlines
-* 4) If there is a non comment rune then we have a token -> Tokenize?
-* 5) Outcome should be an ordered list of tokens (Keywords / New lines)
- */
-func (p *Parser) read() string {
-	if p.isOverflow() {
-		return ""
+func (p *Parser) popToken() (token string, ok bool) {
+	token, ok = p.peekToken()
+	if !ok {
+		return
 	}
-
-	p.skipIfSpace()
-	if p.curr == -1 {
-		return ""
-	}
-	//TODO: Handle NewLine
-	//TODO: Handle Comments
-	if p.curr == '#' {
-
-	}
-
-	//Parse Token (Until Space / Newline)
+	p.position++
+	return token, true
 }
 
-func (p *Parser) skipIfSpace() {
-	for p.curr != -1 && p.curr == ' ' {
+func (p *Parser) peekToken() (token string, ok bool) {
+	if p.position >= len(p.tokens) {
+		return "", false
 	}
-}
-func (p *Parser) readChar() bool {
-	if p.isOverflow() {
-		p.curr = -1
-		return false
-	}
-	p.position.Column += 1
-	if p.isCurrentNewLine() {
-		//Move to next line
-		p.position.Line++
-		p.position.Column = 1
-	}
-	ru, w := rune(p.input[p.position.Offset]), 1
-	if ru >= 0x80 {
-		ru, w = utf8.DecodeRune(p.input[p.position.Offset:])
-	}
-	p.position.Column += 1
-	p.position.Offset += w
-	p.curr = ru
-	return true
-}
-
-func (p *Parser) isCurrentNewLine() bool {
-	return p.curr == '\n'
-}
-func (p *Parser) isCurrentSpace() bool {
-	return p.curr == ' '
-}
-
-func (p *Parser) isOverflow() bool {
-	return p.position.Offset > len(p.input)
+	return p.tokens[p.position], true
 }
