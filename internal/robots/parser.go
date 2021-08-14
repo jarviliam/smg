@@ -23,10 +23,10 @@ func (p *Parser) parseLine() {
 	if !ok1 {
 		return
 	}
-	token2, ok2 := p.peekToken()
-	if !ok2 {
-		return
-	}
+	//token2, ok2 := p.peekToken()
+	// if !ok2 {
+	// 	return
+	// }
 
 	switch strings.ToLower(token1) {
 

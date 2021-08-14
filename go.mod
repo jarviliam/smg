@@ -1,4 +1,4 @@
-module smg
+module github.com/jarviliam/smg
 
 go 1.16
 

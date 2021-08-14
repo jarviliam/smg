@@ -32,11 +32,11 @@ func NewRobots(ignore bool) *Robots {
 
 func (r *Robots) ParseFromResponse(res *http.Response) {
 	if res == nil {
-            return
+		return
 	}
 	buff, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-            return
+		return
 	}
 
 	statusCode := res.StatusCode
@@ -55,22 +55,27 @@ func (r *Robots) ParseFromResponse(res *http.Response) {
 	}
 }
 
+func (r *Robots) IsAllowed(url string) bool {
+	//Verify
+	return true
+}
+
 //TODO: Parse Robots.txt -> Tokens
 //TODO: Tokens -> UserAgentGroups -> Rulesc:W
 
 func parseRobots(body []byte) {
-	lines, err := intoLines(body)
-  reader := NewReader(body)
-  tokens := reader.ExtractTokens()
-  parser := NewParser(tokens)
-  parer.Extract()
+	//lines, err := intoLines(body)
+	reader := NewReader(body)
+	tokens := reader.ExtractTokens()
+	parser := NewParser(tokens)
+	parser.parseTokens()
 }
 
 func intoLines(body []byte) ([]string, error) {
 	var lines []string
-	newLine := "/\r\n|\r|\n/"
-	for {
-          tk := body.
-	}
+	// newLine := "/\r\n|\r|\n/"
+	// for {
+	//          tk := body.
+	// }
 	return lines, nil
 }

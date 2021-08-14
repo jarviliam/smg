@@ -8,36 +8,25 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
+type SMG struct {
+	Spider *Spider
+}
+
+//TODO: Figure Out Why Internal is not Linking
 type Spider struct {
 	client   *http.Client
 	visted   []string
 	MaxDepth int
-	robots   map[string]string
+	Robots   Robots
+	//robots   map[string]string
 }
 
-type Response struct {
-	Code    int
-	Body    []byte
-	Ctx     *Context
-	Request *http.Request
-}
 type LinkElement struct {
 	Attributes map[string]string
-}
-type Request struct {
-	URL     *url.URL
-	Headers *http.Header
-	Ctx     *Context
-	spider  *Spider
-}
-type Context struct {
-	contextMap map[string]string
-	lock       *sync.Mutex
 }
 
 func NewSpider() *Spider {
@@ -50,18 +39,10 @@ func NewSpider() *Spider {
 	}
 	return s
 }
-func NewContext() *Context {
-	c := &Context{
-		contextMap: make(map[string]string),
-		lock:       &sync.Mutex{},
-	}
-	return c
-}
-
 func (s *Spider) Fetch(u string) error {
 	depth := 1
 	parsedUrl, err := url.Parse(u)
-	s.GetRobots(parsedUrl)
+	s.Robots.isAllowed(parsedUrl)
 	if err != nil {
 		return errors.New("Url is empty")
 	}
@@ -71,7 +52,7 @@ func (s *Spider) Fetch(u string) error {
 	if s.hasVisited(u) {
 		return nil
 	}
-	s.visted = append(s.visted, url)
+	s.visted = append(s.visted, parsedUrl.Path)
 	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {
 		fmt.Println(err)
@@ -107,18 +88,16 @@ func (s *Spider) Fetch(u string) error {
 func (s *Spider) parse(req *Request, res *Response) {
 	doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(res.Body))
 	if err != nil {
-		fmt.Println(err)
+		fmt.Errorf(err.Error())
 		return
 	}
 	doc.Find("a").Each(func(i int, s *goquery.Selection) {
 		for _, n := range s.Nodes {
-			fmt.Println("NODE -----")
 			for _, x := range n.Attr {
 				if x.Key == "href" {
-					fmt.Println(x.Val)
+					fmt.Printf("Link Found : %s \n", x.Val)
 				}
 			}
-			fmt.Println("-----")
 		}
 	})
 }
@@ -137,27 +116,9 @@ func (s *Spider) hasVisited(u string) bool {
 	return visited
 }
 
-func (c *Context) Get(key string) string {
-	if v, ok := c.contextMap[key]; ok {
-		return v
-	}
-	return ""
-}
-
-func (c *Context) Put(key, value string, ovrride bool) error {
-	if _, ok := c.contextMap[key]; ok && ovrride {
-		c.contextMap[key] = value
-	} else if ok && !ovrride {
-		return errors.New("Key already exists")
-	} else {
-		c.contextMap[key] = value
-	}
-	return nil
-}
-
 func (s *Spider) GetRobots(u *url.URL) {
-	robot, ok := s.robots[u.Host]
-	if !ok {
+	// robot, ok := s.robots[u.Host]
+	// if !ok {
 
-	}
+	// }
 }

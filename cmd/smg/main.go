@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"smg"
+
+	"github.com/jarviliam/smg"
 )
 
 func main() {
