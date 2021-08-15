@@ -8,7 +8,7 @@ import (
 
 func main() {
 	spider := smg.NewSpider()
-	err := spider.Fetch("https://www.reddit.com/r/neovim")
+	err := spider.Fetch("https://www.reddit.com/r/neovim", 0)
 	if err != nil {
 		fmt.Println(err)
 	}
