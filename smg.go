@@ -10,6 +10,14 @@ import (
 	"net/url"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/jarviliam/smg/internal/logger"
+	"github.com/jarviliam/smg/internal/robots"
+)
+
+var (
+	ErrNoUrl    = errors.New("No Url Recieved")
+	ErrMaxDepth = errors.New("Max Depth")
+	ErrBlocked  = errors.New("Regex Blocked")
 )
 
 type SMG struct {
@@ -39,14 +47,13 @@ func (s *SMG) Run(target string) error {
 	return nil
 }
 
-//TODO: Figure Out Why Internal is not Linking
 type Spider struct {
 	client     *http.Client
+	Logger     *logger.Logger
 	visted     []string
 	MaxDepth   int
 	TargetHost string
-	//Robots   Robots
-	//robots   map[string]string
+	Robots     *robots.Robots
 }
 
 type LinkElement struct {
@@ -60,6 +67,7 @@ func NewSpider() *Spider {
 		client: &http.Client{
 			Jar: jar,
 		},
+		Robots: robots.NewRobots(true),
 	}
 	return s
 }
@@ -74,8 +82,8 @@ func (s *Spider) Fetch(u string, depth int) error {
 		fmt.Println(err.Error())
 		return nil
 	}
-	//	s.Robots.isAllowed(parsedUrl)
-	if s.hasVisited(u) {
+	if s.hasVisited(parsedUrl.Path) {
+		fmt.Println("Visted Url")
 		return nil
 	}
 	s.visted = append(s.visted, parsedUrl.Path)
@@ -84,6 +92,7 @@ func (s *Spider) Fetch(u string, depth int) error {
 		fmt.Println(err)
 		return err
 	}
+	s.Logger.LogInfo("Visting : %s At Depth: %d \n", u, depth)
 	ctx := NewContext()
 	//Request Struct
 	request := &Request{
@@ -130,13 +139,6 @@ func (s *Spider) parse(req *Request, res *Response) {
 	})
 }
 
-var (
-	ErrNoUrl    = errors.New("No Url Recieved")
-	ErrMaxDepth = errors.New("Max Depth")
-	ErrBlocked  = errors.New("Regex Blocked")
-)
-
-//TODO: Robots Check
 func (s *Spider) isValidUrl(plainUrl string, parsedUrl *url.URL, depth int) error {
 	if plainUrl == "" {
 		return ErrNoUrl
@@ -162,9 +164,7 @@ func (s *Spider) hasVisited(u string) bool {
 	return visited
 }
 
-func (s *Spider) GetRobots(u *url.URL) {
-	// robot, ok := s.robots[u.Host]
-	// if !ok {
-
-	// }
+func (s *Spider) CheckRobots(u *url.URL) bool {
+	allowed := s.Robots.IsAllowed(u.Path)
+	return allowed
 }

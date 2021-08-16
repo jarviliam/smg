@@ -1,5 +1,6 @@
 package robots_test
 
+//TODO Redo
 import (
 	"io"
 	"os"
@@ -21,5 +22,5 @@ func TestNewParser() {
 }
 
 func TestParseHeader() {
-    
+
 }

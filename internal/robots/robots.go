@@ -6,6 +6,7 @@ import (
 	"regexp"
 )
 
+//TODO: Parse -> Tokens
 type Robots struct {
 	IgnoreRobots bool
 	HasFetched   bool
