@@ -26,6 +26,11 @@ type SMG struct {
 	Options    interface{}
 }
 
+type LinkEntry struct {
+	url   string
+	depth int
+}
+
 func NewSMG() *SMG {
 	s := &SMG{}
 	return s
@@ -47,23 +52,23 @@ func (s *SMG) Run(target string) error {
 	return nil
 }
 
+type LinkElement struct {
+	Attributes map[string]string
+}
+
 type Spider struct {
 	client     *http.Client
 	Logger     *logger.Logger
-	visted     []string
+	visited    []*LinkEntry
 	MaxDepth   int
 	TargetHost string
 	Robots     *robots.Robots
 }
 
-type LinkElement struct {
-	Attributes map[string]string
-}
-
 func NewSpider() *Spider {
 	jar, _ := cookiejar.New(nil)
 	s := &Spider{
-		visted: make([]string, 10),
+		visited: make([]*LinkEntry, 10),
 		client: &http.Client{
 			Jar: jar,
 		},
@@ -83,10 +88,14 @@ func (s *Spider) Fetch(u string, depth int) error {
 		return nil
 	}
 	if s.hasVisited(parsedUrl.Path) {
+		s.replaceIfNeeded(parsedUrl.Path, depth)
 		fmt.Println("Visted Url")
 		return nil
 	}
-	s.visted = append(s.visted, parsedUrl.Path)
+	s.visited = append(s.visited, &LinkEntry{
+		url:   parsedUrl.Path,
+		depth: depth,
+	})
 	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {
 		fmt.Println(err)
@@ -155,13 +164,22 @@ func (s *Spider) isValidUrl(plainUrl string, parsedUrl *url.URL, depth int) erro
 }
 func (s *Spider) hasVisited(u string) bool {
 	visited := false
-	for _, v := range s.visted {
-		if v == u {
+	for _, v := range s.visited {
+		if v.url == u {
 			visited = true
 			break
 		}
 	}
 	return visited
+}
+
+func (s *Spider) replaceIfNeeded(u string, d int) {
+	for _, v := range s.visited {
+		if v.url == u && v.depth > d {
+			v.depth = d
+			break
+		}
+	}
 }
 
 func (s *Spider) CheckRobots(u *url.URL) bool {
