@@ -27,6 +27,7 @@ func NewRobots(ignore bool) *Robots {
 	r := &Robots{
 		IgnoreRobots: ignore,
 		HasFetched:   false,
+
 	}
 	return r
 }

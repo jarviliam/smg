@@ -1,4 +1,4 @@
-package smg
+package context
 
 import (
 	"errors"

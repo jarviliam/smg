@@ -1,14 +1,16 @@
-package smg
+package spider
 
 import (
 	"net/http"
 	"net/url"
+
+	"github.com/jarviliam/smg/internal/context"
 )
 
 type Request struct {
 	URL     *url.URL
 	Headers *http.Header
 	Depth   int
-	Ctx     *Context
+	Ctx     *context.Context
 	spider  *Spider
 }

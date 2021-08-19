@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	spider := smg.NewSpider()
-	err := spider.Fetch("https://www.reddit.com/r/neovim", 0)
+	smg := smg.NewSMG()
+	err := smg.Run("http://localhost:8080/pokesp/servlet/test/sp/index.html")
 	if err != nil {
 		fmt.Println(err)
 	}
