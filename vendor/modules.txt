@@ -1,0 +1,21 @@
+# github.com/PuerkitoBio/goquery v1.7.1
+## explicit
+github.com/PuerkitoBio/goquery
+# github.com/andybalholm/cascadia v1.2.0
+github.com/andybalholm/cascadia
+# github.com/davecgh/go-spew v1.1.0
+github.com/davecgh/go-spew/spew
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
+# github.com/stretchr/testify v1.7.0
+## explicit
+github.com/stretchr/testify/assert
+# github.com/temoto/robotstxt v1.1.2
+## explicit
+github.com/temoto/robotstxt
+# golang.org/x/net v0.0.0-20210929193557-e81a3d93ecf6
+## explicit
+golang.org/x/net/html
+golang.org/x/net/html/atom
+# gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+gopkg.in/yaml.v3

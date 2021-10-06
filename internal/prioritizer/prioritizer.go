@@ -28,9 +28,7 @@ func NewPrioritizer(pf ...PriorityFN) *Prioritizer {
 		def: float32(DEFAULT_PRIORITY),
 		fns: make([]PriorityFN, 0),
 	}
-	for _, f := range pf {
-		p.fns = append(p.fns, f)
-	}
+	p.fns = append(p.fns, pf...)
 	return p
 }
 

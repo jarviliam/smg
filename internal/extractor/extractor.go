@@ -59,9 +59,7 @@ func NewExtractor(originURL string, regex ...*regexp.Regexp) (*Extractor, error)
 	data, err := robotstxt.FromResponse(resp)
 	resp.Body.Close()
 	e := &Extractor{checkers: make([]func(), 0), host: host, ignoreLink: make([]*regexp.Regexp, 0), robots: data}
-	for _, r := range regex {
-		e.ignoreLink = append(e.ignoreLink, r)
-	}
+	e.ignoreLink = append(e.ignoreLink, regex...)
 	return e, nil
 }
 func (e *Extractor) isSameHost(link string) bool {
